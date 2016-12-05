@@ -25,6 +25,7 @@ class TestGraph(TestCase):
         edges = [[0, 1, 0], [1, 2, 0], [1, 3, 0], [2, 1, 0], [2, 3, 1]]
         assert len(edges) == len(graph.edges) and all(edge in graph.edges for edge in edges)
         assert len(graph.distances) == 1 and graph.distances[0] == [0] * graph._n
+        assert len(graph._from_vertice) == 1 and graph._from_vertice[0] == [0] * graph._n
 
     def test_add_distances(self):
         graph = Graph(np.array([[1, 0, -1, -1],
@@ -33,13 +34,19 @@ class TestGraph(TestCase):
                                 [-1, -1, 1, 0]]))
         graph.add_distances()
         dists1 = [np.inf, 0, 0, 0]
+        vertices1 = [np.inf, 0, 1, 1]
         assert all(el1 == el2 for el1, el2 in zip(graph.distances[-1], dists1))
+        assert all(el1 == el2 for el1, el2 in zip(graph._from_vertice[-1], vertices1))
         graph.add_distances()
         dists2 = [np.inf, 1, 0, 0]
+        vertices2 = [np.inf, 2, 1, 1]
         assert all(el1 == el2 for el1, el2 in zip(graph.distances[-1], dists2))
+        assert all(el1 == el2 for el1, el2 in zip(graph._from_vertice[-1], vertices2))
         graph.add_distances()
         dists3 = [np.inf, 1, 1, 1]
+        vertices3 = [np.inf, 2, 1, 1]
         assert all(el1 == el2 for el1, el2 in zip(graph.distances[-1], dists3))
+        assert all(el1 == el2 for el1, el2 in zip(graph._from_vertice[-1], vertices3))
 
     def test_get_pi_vect(self):
         graph = Graph(np.array([[1, 0, -1, -1],
@@ -58,3 +65,10 @@ class TestGraph(TestCase):
                                 [-1, -1, 1, 0]]))
         assert graph.get_pi(3) == 1
         assert graph.get_pi(2) == 0
+
+    def test_count_c(self):
+        graph = Graph(np.array([[1, 0, -1, -1],
+                                [-1, -1, 0, 0],
+                                [-1, 1, 1, 1],
+                                [-1, -1, 1, 0]]))
+        assert 0.5 == graph.count_c()
