@@ -3,7 +3,12 @@ import collections
 
 
 class AS1:
-    def __init__(self, input_filename):
+    def __init__(self, a, b):
+        n = len(a)
+        self.a, self.b, self.n = np.array(a), np.array(b), n
+
+    @staticmethod
+    def read_from_file(input_filename):
         with open(input_filename, 'r') as inp:
             lines = inp.readlines()
             lines = [line.strip() for line in lines if line.strip()]
@@ -11,8 +16,7 @@ class AS1:
             b = np.array([list(map(int, line.split(","))) for line in lines[1:]])
         if len(a) != len(b) or b.shape[0] + 1 != b.shape[1]:
             raise IOError("Incorrect format of a and B")
-        n = len(a)
-        self.a, self.b, self.n = a, b, n
+        return AS1(a, b)
 
     @staticmethod
     def _get_int(bool_arr):
@@ -93,11 +97,8 @@ class AS1:
                 graph[AS1._get_int(alpha), AS1._get_int(beta)] = s
         return graph
 
-
-if __name__ == '__main__':
-    as1 = AS1('as')
-    gr = as1.create_linear_transitions_graph()
-    for i in range(gr.shape[0]):
-        for j in range(gr.shape[1]):
-            if gr[i][j] != -1:
-                print(i, j, gr[i][j])
+    @staticmethod
+    def write_graph_into_file(graph, filename):
+        with open(filename, 'w') as f:
+            for row in graph:
+                f.write(",".join(str(el) for el in row) + "\n")

@@ -14,6 +14,7 @@ class Graph:
         self._n = len(adjacency_matrix)
         self.distances = [[0]*self._n]
         self._from_vertice = [[0] * self._n]
+        self.cycles, self.weights = [], []
 
     def add_distances(self):
         possible_dists = [np.inf] * self._n
@@ -37,17 +38,43 @@ class Graph:
         return np.min(self.get_pi_vect(l))
 
     def count_c(self):
-        cycle_el = np.argmin(self.get_pi_vect(self._n * 2))
-        min_cycle_vertices = set()
-        last_step_index = len(self._from_vertice) - 1
-        cycle = []
-        while cycle_el not in min_cycle_vertices:
-            cycle.append(cycle_el)
-            min_cycle_vertices.add(cycle_el)
-            cycle_el = self._from_vertice[last_step_index][cycle_el]
-            last_step_index -= 1
-        cycle_weight = self.get_pi(2 * self._n) - self.get_pi(last_step_index)
-        return cycle_weight / len(cycle)
+        if len(self.weights) > 0:
+            return np.min(self.weights)
+        number_of_steps = self._n + 1
+        pi_vect = self.get_pi_vect(number_of_steps)
+        touched_veritces, cycles, weights = set(), [], []
+        for i in range(self._n):
+            if i not in touched_veritces and np.isfinite(pi_vect[i]):
+                step, new_cycle, new_cycle_set, this_vertice = number_of_steps, [], set(), i
+                while this_vertice not in new_cycle_set:
+                    touched_veritces.add(this_vertice)
+                    new_cycle.append(this_vertice)
+                    new_cycle_set.add(this_vertice)
+                    this_vertice = self._from_vertice[step][this_vertice]
+                    step -= 1
+                weight = 0
+                for to, fr in zip(new_cycle, new_cycle[1:] + new_cycle[:1]):
+                    weight += self.adjacency_matrix[fr][to]
+                print("Weight: ", weight * 1.0 / len(new_cycle))
+                weights.append(weight * 1.0 / len(new_cycle))
+                cycles.append(new_cycle)
+        self.cycles = cycles
+        self.weights = weights
+        return np.min(weights)
+
+    @staticmethod
+    def read_graph_from_file(filename):
+        file_lines = open(filename, 'r').readlines()
+        adjacency_matrix = np.array([list(map(lambda x: int(x.strip()), line.split(","))) for line in file_lines])
+        return Graph(adjacency_matrix)
+
+
+if __name__ == '__main__':
+    graph = Graph.read_graph_from_file('linear_trans')
+    graph.count_c()
+
+
+
 
 
 
