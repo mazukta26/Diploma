@@ -40,24 +40,20 @@ class Graph:
     def count_c(self):
         if len(self.weights) > 0:
             return np.min(self.weights)
-        number_of_steps = self._n + 1
+        number_of_steps = self._n * 2
         pi_vect = self.get_pi_vect(number_of_steps)
-        touched_veritces, cycles, weights = set(), [], []
+        cycles, weights = [], []
         for i in range(self._n):
-            if i not in touched_veritces and np.isfinite(pi_vect[i]):
-                step, new_cycle, new_cycle_set, this_vertice = number_of_steps, [], set(), i
-                while this_vertice not in new_cycle_set:
-                    touched_veritces.add(this_vertice)
+            if np.isfinite(pi_vect[i]):
+                step, new_cycle, new_cycle_dict, this_vertice = number_of_steps, [], dict(), i
+                while this_vertice not in new_cycle_dict:
                     new_cycle.append(this_vertice)
-                    new_cycle_set.add(this_vertice)
+                    new_cycle_dict[this_vertice] = step
                     this_vertice = self._from_vertice[step][this_vertice]
                     step -= 1
-                weight = 0
-                for to, fr in zip(new_cycle, new_cycle[1:] + new_cycle[:1]):
-                    weight += self.adjacency_matrix[fr][to]
-                print("Weight: ", weight * 1.0 / len(new_cycle))
+                weight = self.distances[new_cycle_dict[this_vertice]][this_vertice] - self.distances[step][this_vertice]
                 weights.append(weight * 1.0 / len(new_cycle))
-                cycles.append(new_cycle)
+                cycles.append(new_cycle + [this_vertice])
         self.cycles = cycles
         self.weights = weights
         return np.min(weights)
@@ -71,6 +67,7 @@ class Graph:
 
 if __name__ == '__main__':
     graph = Graph.read_graph_from_file('linear_trans')
+    print(graph.adjacency_matrix)
     graph.count_c()
 
 

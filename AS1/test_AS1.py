@@ -13,10 +13,12 @@ class TestAS1(TestCase):
             inp.write(zeros*4)
         a = [1, 0, 1]
         b = [[1, 1, 0, 1], [0, 1, 1, 0], [1, 0, 1, 0]]
+        pseudo_a = a[:] + [0]
+        pseudo_b = b[:]
+        pseudo_b.append(pseudo_a)
+        pseudo_b = np.array(pseudo_b).T
         with open(cls.successful_input, 'w') as inp:
-            inp.write(','.join(map(str, a)) + "\n")
-            for row in b:
-                inp.write(",".join(map(str, row)) + "\n")
+            inp.write("\n".join([",".join(map(str, line)) for line in pseudo_b]))
         cls.a, cls.b = a, b
 
     def test_read_from_file_failure(self):

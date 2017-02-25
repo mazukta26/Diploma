@@ -72,3 +72,5 @@ class TestGraph(TestCase):
                                 [-1, 1, 1, 1],
                                 [-1, -1, 1, 0]]))
         assert 0.5 == graph.count_c()
+        graph = Graph.read_graph_from_file('linear_trans')
+        assert 0.5 == graph.count_c()

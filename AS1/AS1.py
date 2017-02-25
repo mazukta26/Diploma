@@ -12,10 +12,11 @@ class AS1:
         with open(input_filename, 'r') as inp:
             lines = inp.readlines()
             lines = [line.strip() for line in lines if line.strip()]
-            a = np.array(list(map(int, lines[0].split(","))))
-            b = np.array([list(map(int, line.split(","))) for line in lines[1:]])
-        if len(a) != len(b) or b.shape[0] + 1 != b.shape[1]:
+            matrix = np.array([list(map(int, line.split(","))) for line in lines])
+        if matrix.shape[0] != matrix.shape[1]:
             raise IOError("Incorrect format of a and B")
+        a = matrix[:-1, -1].flatten()
+        b = matrix[:, :-1].T
         return AS1(a, b)
 
     @staticmethod
