@@ -17,6 +17,10 @@ def create_belt(n):
 
 
 if __name__ == '__main__':
+    d_graph = Graph.read_graph_from_file('skipjacka_diff.txt')
+    l_graph = Graph.read_graph_from_file('skipjacka_lin.txt')
+    print("lambda({}) = {}".format(0, l_graph.count_c()))
+    print("pi({}) = {}".format(0, d_graph.count_c()))
     for n in range(2, 20):
         as1 = AS1(*create_belt(n))
         lin = as1.create_linear_transitions_graph()

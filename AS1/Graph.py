@@ -52,7 +52,7 @@ class Graph:
                     this_vertice = self._from_vertice[step][this_vertice]
                     step -= 1
                 weight = self.distances[new_cycle_dict[this_vertice]][this_vertice] - self.distances[step][this_vertice]
-                weights.append(weight * 1.0 / len(new_cycle))
+                weights.append(weight * 1.0 / (new_cycle_dict[this_vertice] - step))
                 cycles.append(new_cycle + [this_vertice])
         self.cycles = cycles
         self.weights = weights

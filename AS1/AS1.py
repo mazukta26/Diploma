@@ -8,11 +8,11 @@ class AS1:
         self.a, self.b, self.n = np.array(a), np.array(b), n
 
     @staticmethod
-    def read_from_file(input_filename):
+    def read_from_file(input_filename, sep):
         with open(input_filename, 'r') as inp:
             lines = inp.readlines()
             lines = [line.strip() for line in lines if line.strip()]
-            matrix = np.array([list(map(int, line.split(","))) for line in lines])
+            matrix = np.array([list(map(int, line.split(sep))) for line in lines])
         if matrix.shape[0] != matrix.shape[1]:
             raise IOError("Incorrect format of a and B")
         a = matrix[:-1, -1].flatten()
@@ -103,3 +103,10 @@ class AS1:
         with open(filename, 'w') as f:
             for row in graph:
                 f.write(",".join(str(el) for el in row) + "\n")
+
+if __name__ == '__main__':
+    skipjacka = AS1.read_from_file('skipjacka.txt', ' ')
+    diff_graph = skipjacka.create_differential_graph()
+    lin_graph = skipjacka.create_linear_transitions_graph()
+    AS1.write_graph_into_file(diff_graph, 'skipjacka_diff.txt')
+    AS1.write_graph_into_file(lin_graph, 'skipjacka_lin.txt')
