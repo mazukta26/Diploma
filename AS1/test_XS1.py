@@ -1,9 +1,9 @@
-import AS1
+import XS1
 import numpy as np
 from unittest import TestCase
 
 
-class TestAS1(TestCase):
+class TestXS1(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.successful_input = 'successful_input'
@@ -24,7 +24,7 @@ class TestAS1(TestCase):
     def test_read_from_file_failure(self):
         caught = False
         try:
-            _ = AS1.AS1.read_from_file(self.failing_input, ',')
+            _ = XS1.XS1.read_from_file(self.failing_input, ',')
         except IOError:
             caught = True
         else:
@@ -33,27 +33,27 @@ class TestAS1(TestCase):
             self.fail('Expected IOError')
 
     def test_read_from_file_success(self):
-        successful = AS1.AS1.read_from_file(self.successful_input, ',')
+        successful = XS1.XS1.read_from_file(self.successful_input, ',')
         assert np.all(self.a == successful.a) and np.all(np.array(self.b) == successful.b),\
             'Input for a and B is not equal to output'
 
     def test_get_int(self):
-        assert AS1.AS1._get_int([1, 0, 0, 1, 0, 1, 1]) == 75
-        assert AS1.AS1._get_int([0, 0, 0, 0, 0]) == 0
+        assert XS1.XS1._get_int([1, 0, 0, 1, 0, 1, 1]) == 75
+        assert XS1.XS1._get_int([0, 0, 0, 0, 0]) == 0
 
     def test_get_bool(self):
-        obj = AS1.AS1.read_from_file(self.successful_input, ',')
+        obj = XS1.XS1.read_from_file(self.successful_input, ',')
         assert obj._get_bool(3) == [0, 1, 1]
         assert obj._get_bool(7) == [1, 1, 1]
         assert obj._get_bool(0) == [0, 0, 0]
 
     def test_diff_oper(self):
-        assert AS1.AS1.diff_oper([0, 0, 0, 0, 0]) == (0,)
-        assert AS1.AS1.diff_oper([0, 1, 0, 0, 0, 0]) == (1,)
-        assert AS1.AS1.diff_oper([0, 1, 0, 1, 0, 0, 0]) == (0, 1) or AS1.AS1.diff_oper([0, 1, 0, 1, 0, 0, 0]) == (1, 0)
-        assert AS1.AS1.diff_oper([1, 1, 1, 1]) == (0, 1) or AS1.AS1.diff_oper([1, 1, 1, 1]) == (1, 0)
-        assert AS1.AS1.diff_oper([1]) == (1,)
-        assert AS1.AS1.diff_oper([0]) == (0,)
+        assert XS1.XS1.diff_oper([0, 0, 0, 0, 0]) == (0,)
+        assert XS1.XS1.diff_oper([0, 1, 0, 0, 0, 0]) == (1,)
+        assert XS1.XS1.diff_oper([0, 1, 0, 1, 0, 0, 0]) == (0, 1) or XS1.XS1.diff_oper([0, 1, 0, 1, 0, 0, 0]) == (1, 0)
+        assert XS1.XS1.diff_oper([1, 1, 1, 1]) == (0, 1) or XS1.XS1.diff_oper([1, 1, 1, 1]) == (1, 0)
+        assert XS1.XS1.diff_oper([1]) == (1,)
+        assert XS1.XS1.diff_oper([0]) == (0,)
 
     def test_get_transitions_by_tuples(self):
         tuples = [(1,), (0,), (0, 1), (1,), (0, 1)]
@@ -61,13 +61,13 @@ class TestAS1(TestCase):
                        [1, 0, 1, 1, 0],
                        [1, 0, 0, 1, 1],
                        [1, 0, 1, 1, 1]]
-        result = AS1.AS1.get_transitions_by_tuples(tuples)
+        result = XS1.XS1.get_transitions_by_tuples(tuples)
         assert len(result) == np.prod(list(map(len, tuples)))
         assert all([len(res) == len(tuples) for res in result])
         assert all([should_have_example in result for should_have_example in should_have])
 
     def test_get_transitions_by_abv(self):
-        obj = AS1.AS1.read_from_file(self.successful_input, ',')
+        obj = XS1.XS1.read_from_file(self.successful_input, ',')
         v = [1, 0, 0]
         expected = [[0, 0, 1], [1, 0, 1]]
         gotten_trans, gotten_s = obj.get_transitions_by_abv(v)
@@ -78,7 +78,7 @@ class TestAS1(TestCase):
         assert gotten_trans == [[1, 1, 0]]
 
     def test_create_differential_graph(self):
-        obj = AS1.AS1.read_from_file(self.successful_input, ',')
+        obj = XS1.XS1.read_from_file(self.successful_input, ',')
         expected = np.array([[0, -1, -1, -1, -1, -1, -1, -1],
                              [-1, -1, -1, -1, -1, -1, -1,  1],
                              [-1, -1, -1, -1, -1, -1,  0, -1],
@@ -91,13 +91,13 @@ class TestAS1(TestCase):
         assert np.all(gotten == expected)
 
     def test_get_alphas(self):
-        obj = AS1.AS1.read_from_file(self.successful_input, ',')
+        obj = XS1.XS1.read_from_file(self.successful_input, ',')
         expected = [[0, 1, 1], [1, 1, 1], [0, 1, 0], [1, 1, 0]]
         gotten = obj.get_alphas([1, 0, 1])
         assert len(gotten) == len(expected) and all([expected_example in gotten for expected_example in expected])
 
     def test_create_linear_transitions_graph(self):
-        obj = AS1.AS1.read_from_file(self.successful_input, ',')
+        obj = XS1.XS1.read_from_file(self.successful_input, ',')
         expected = np.array([[0, -1, -1, -1, -1, -1, 0, 0],
                              [-1, -1, -1, -1, -1, -1, 1, 1],
                              [-1, -1, -1, -1, -1, 0, 0, 0],
@@ -110,7 +110,7 @@ class TestAS1(TestCase):
         assert np.all(gotten == expected)
 
     def test_write_graph_into_file(self):
-        obj = AS1.AS1.read_from_file(self.successful_input, ',')
+        obj = XS1.XS1.read_from_file(self.successful_input, ',')
         expected = np.array([[0, -1, -1, -1, -1, -1, 0, 0],
                              [-1, -1, -1, -1, -1, -1, 1, 1],
                              [-1, -1, -1, -1, -1, 0, 0, 0],

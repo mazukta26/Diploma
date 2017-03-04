@@ -2,7 +2,7 @@ import numpy as np
 import collections
 
 
-class AS1:
+class XS1:
     def __init__(self, a, b):
         n = len(a)
         self.a, self.b, self.n = np.array(a), np.array(b), n
@@ -17,7 +17,7 @@ class AS1:
             raise IOError("Incorrect format of a and B")
         a = matrix[:-1, -1].flatten()
         b = matrix[:, :-1].T
-        return AS1(a, b)
+        return XS1(a, b)
 
     @staticmethod
     def _get_int(bool_arr):
@@ -62,8 +62,8 @@ class AS1:
         v.append(s)
         trans = []
         for row in self.b:
-            trans.append(AS1.diff_oper(row * v))
-        res = AS1.get_transitions_by_tuples(trans)
+            trans.append(XS1.diff_oper(row * v))
+        res = XS1.get_transitions_by_tuples(trans)
         return res, s
 
     def create_differential_graph(self):
@@ -72,7 +72,7 @@ class AS1:
             v = self._get_bool(i)
             all_transitions, their_s = self.get_transitions_by_abv(v)
             for trans in all_transitions:
-                graph[i, AS1._get_int(trans)] = their_s
+                graph[i, XS1._get_int(trans)] = their_s
         return graph
 
     def get_alphas(self, beta):
@@ -82,8 +82,8 @@ class AS1:
             alphas.append((beta * b).tolist())
             if a:
                 alphas[-1].extend(s)
-        alpha_tuples = [AS1.diff_oper(alpha) for alpha in alphas]
-        return AS1.get_transitions_by_tuples(alpha_tuples)
+        alpha_tuples = [XS1.diff_oper(alpha) for alpha in alphas]
+        return XS1.get_transitions_by_tuples(alpha_tuples)
 
     def create_linear_transitions_graph(self):
         graph = np.full((2 ** self.n, 2 ** self.n), fill_value=-1, dtype='int64')
@@ -95,7 +95,7 @@ class AS1:
         for alpha in alpha_beta_dict:
             s = int(np.sum(np.array(alpha) * self.a) > 0)
             for beta in alpha_beta_dict[alpha]:
-                graph[AS1._get_int(alpha), AS1._get_int(beta)] = s
+                graph[XS1._get_int(alpha), XS1._get_int(beta)] = s
         return graph
 
     @staticmethod
@@ -105,8 +105,8 @@ class AS1:
                 f.write(",".join(str(el) for el in row) + "\n")
 
 if __name__ == '__main__':
-    skipjacka = AS1.read_from_file('skipjacka.txt', ' ')
+    skipjacka = XS1.read_from_file('skipjacka.txt', ' ')
     diff_graph = skipjacka.create_differential_graph()
     lin_graph = skipjacka.create_linear_transitions_graph()
-    AS1.write_graph_into_file(diff_graph, 'skipjacka_diff.txt')
-    AS1.write_graph_into_file(lin_graph, 'skipjacka_lin.txt')
+    XS1.write_graph_into_file(diff_graph, 'skipjacka_diff.txt')
+    XS1.write_graph_into_file(lin_graph, 'skipjacka_lin.txt')

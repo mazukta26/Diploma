@@ -1,5 +1,5 @@
 import numpy as np
-from AS1 import AS1
+from XS1 import XS1
 from Graph import Graph
 from time import time
 
@@ -22,9 +22,9 @@ if __name__ == '__main__':
     print("lambda({}) = {}".format(0, l_graph.count_c()))
     print("pi({}) = {}".format(0, d_graph.count_c()))
     for n in range(2, 20):
-        as1 = AS1(*create_belt(n))
-        lin = as1.create_linear_transitions_graph()
-        diff = as1.create_differential_graph()
+        xs1 = XS1(*create_belt(n))
+        lin = xs1.create_linear_transitions_graph()
+        diff = xs1.create_differential_graph()
         l_graph = Graph(lin)
         d_graph = Graph(diff)
         print("lambda({}) = {}".format(n, l_graph.count_c()))
