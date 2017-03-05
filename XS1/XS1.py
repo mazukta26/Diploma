@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import collections
 
@@ -105,8 +106,9 @@ class XS1:
                 f.write(",".join(str(el) for el in row) + "\n")
 
 if __name__ == '__main__':
-    skipjacka = XS1.read_from_file('skipjacka.txt', ' ')
-    diff_graph = skipjacka.create_differential_graph()
-    lin_graph = skipjacka.create_linear_transitions_graph()
-    XS1.write_graph_into_file(diff_graph, 'skipjacka_diff.txt')
-    XS1.write_graph_into_file(lin_graph, 'skipjacka_lin.txt')
+    scheme_filename, scheme_name = sys.argv[1:]
+    scheme = XS1.read_from_file(scheme_filename, ' ')
+    diff_graph = scheme.create_differential_graph()
+    lin_graph = scheme.create_linear_transitions_graph()
+    XS1.write_graph_into_file(diff_graph, '{}_diff.txt'.format(scheme_name))
+    XS1.write_graph_into_file(lin_graph, '{}_lin.txt'.format(scheme_name))

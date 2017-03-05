@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 
 
@@ -66,9 +67,9 @@ class Graph:
 
 
 if __name__ == '__main__':
-    graph = Graph.read_graph_from_file('linear_trans')
-    print(graph.adjacency_matrix)
-    graph.count_c()
+    graph_filename = sys.argv[1]
+    graph = Graph.read_graph_from_file(graph_filename)
+    print("MCM is equal to {}".format(graph.count_c()))
 
 
 
