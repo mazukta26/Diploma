@@ -8,9 +8,18 @@ class TestXS1(TestCase):
     def setUpClass(cls):
         cls.successful_input = 'successful_input'
         cls.failing_input = 'failing_input'
+        cls.skipjacka = "skipjacka"
         with open(cls.failing_input, 'w') as inp:
             zeros = "0,0,0\n"
-            inp.write(zeros*4)
+            inp.write(zeros * 4)
+        a = [1, 0, 0, 0]
+        b = [[0, 0, 0, 1, 1], [0, 0, 0, 0, 1], [0, 1, 0, 0, 0], [0, 0, 1, 0, 0]]
+        pseudo_a = a[:] + [0]
+        pseudo_b = b[:]
+        pseudo_b.append(pseudo_a)
+        pseudo_b = np.array(pseudo_b).T
+        with open(cls.skipjacka, 'w') as inp:
+            inp.write("\n".join([",".join(map(str, line)) for line in pseudo_b]))
         a = [1, 0, 1]
         b = [[1, 1, 0, 1], [0, 1, 1, 0], [1, 0, 1, 0]]
         pseudo_a = a[:] + [0]
@@ -34,7 +43,7 @@ class TestXS1(TestCase):
 
     def test_read_from_file_success(self):
         successful = XS1.XS1.read_from_file(self.successful_input, ',')
-        assert np.all(self.a == successful.a) and np.all(np.array(self.b) == successful.b),\
+        assert np.all(self.a == successful.a) and np.all(np.array(self.b) == successful.b), \
             'Input for a and B is not equal to output'
 
     def test_get_int(self):
@@ -80,9 +89,9 @@ class TestXS1(TestCase):
     def test_create_differential_graph(self):
         obj = XS1.XS1.read_from_file(self.successful_input, ',')
         expected = np.array([[0, -1, -1, -1, -1, -1, -1, -1],
-                             [-1, -1, -1, -1, -1, -1, -1,  1],
-                             [-1, -1, -1, -1, -1, -1,  0, -1],
-                             [-1,  1, -1, 1, -1, 1, -1, 1],
+                             [-1, -1, -1, -1, -1, -1, -1, 1],
+                             [-1, -1, -1, -1, -1, -1, 0, -1],
+                             [-1, 1, -1, 1, -1, 1, -1, 1],
                              [-1, 1, -1, -1, -1, 1, -1, -1],
                              [-1, -1, 1, 1, -1, -1, 1, 1],
                              [-1, -1, -1, 1, -1, -1, -1, 1],
@@ -91,42 +100,52 @@ class TestXS1(TestCase):
         assert np.all(gotten == expected)
 
     def test_get_alphas(self):
-        obj = XS1.XS1.read_from_file(self.successful_input, ',')
-        expected = [[0, 1, 1], [1, 1, 1], [0, 1, 0], [1, 1, 0]]
-        gotten = obj.get_alphas([1, 0, 1])
-        assert len(gotten) == len(expected) and all([expected_example in gotten for expected_example in expected])
+        obj = XS1.XS1.read_from_file(self.skipjacka, ',')
+        expected = {0: [[0, 0, 0, 1]], 1: [[1, 0, 0, 1]]}
+        gotten = obj.get_alphas([1, 1, 0, 0])
+        assert gotten == expected
 
     def test_create_linear_transitions_graph(self):
-        obj = XS1.XS1.read_from_file(self.successful_input, ',')
-        expected = np.array([[0, -1, -1, -1, -1, -1, 0, 0],
-                             [-1, -1, -1, -1, -1, -1, 1, 1],
-                             [-1, -1, -1, -1, -1, 0, 0, 0],
-                             [-1, -1, 1, -1, 1, 1, 1, 1],
-                             [-1, -1, -1, -1, -1, -1, 1, 1],
-                             [-1, 1, -1, -1, -1, -1, 1, 1],
-                             [-1, -1, -1, 1, -1, 1, 1, 1],
-                             [-1, -1, -1, 1, 1, 1, 1, 1]])
+        obj = XS1.XS1.read_from_file(self.skipjacka, ',')
+        expected = np.array([[0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1],
+                             [-1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1],
+                             [-1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1],
+                             [-1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0],
+                             [-1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1]])
         gotten = obj.create_linear_transitions_graph()
         assert np.all(gotten == expected)
 
     def test_write_graph_into_file(self):
-        obj = XS1.XS1.read_from_file(self.successful_input, ',')
-        expected = np.array([[0, -1, -1, -1, -1, -1, 0, 0],
-                             [-1, -1, -1, -1, -1, -1, 1, 1],
-                             [-1, -1, -1, -1, -1, 0, 0, 0],
-                             [-1, -1, 1, -1, 1, 1, 1, 1],
-                             [-1, -1, -1, -1, -1, -1, 1, 1],
-                             [-1, 1, -1, -1, -1, -1, 1, 1],
-                             [-1, -1, -1, 1, -1, 1, 1, 1],
-                             [-1, -1, -1, 1, 1, 1, 1, 1]])
+        obj = XS1.XS1.read_from_file(self.skipjacka, ',')
         obj.write_graph_into_file(obj.create_linear_transitions_graph(), "linear_trans")
         file_lines = open('linear_trans', 'r').readlines()
         gotten = np.array([list(map(lambda x: int(x.strip()), line.split(","))) for line in file_lines])
+        expected = np.array([[0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1],
+                             [-1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1],
+                             [-1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1],
+                             [-1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0],
+                             [-1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1],
+                             [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1]])
+
         assert np.all(gotten == expected)
-
-
-
-
-
-
-

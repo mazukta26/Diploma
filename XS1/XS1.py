@@ -77,26 +77,32 @@ class XS1:
         return graph
 
     def get_alphas(self, beta):
-        s = beta * self.b[:, -1]
-        alphas = []
-        for a, b in zip(self.a, self.b.T):
-            alphas.append((beta * b).tolist())
-            if a:
-                alphas[-1].extend(s)
-        alpha_tuples = [XS1.diff_oper(alpha) for alpha in alphas]
-        return XS1.get_transitions_by_tuples(alpha_tuples)
+        weights = XS1.diff_oper(beta * self.b[:, -1])
+        result_by_weight = dict()
+        for weight in weights:
+            alphas = []
+            for a, b in zip(self.a, self.b.T):
+                alphas.append((beta * b).tolist())
+                alphas[-1].append(weight*a)
+            alpha_tuples = [XS1.diff_oper(alpha) for alpha in alphas]
+            result_by_weight[weight] = XS1.get_transitions_by_tuples(alpha_tuples)
+        return result_by_weight
+
+    @staticmethod
+    def weight_selecting_multiedge(was, now):
+        if was == -1:
+            return now
+        return min(was, now)
 
     def create_linear_transitions_graph(self):
         graph = np.full((2 ** self.n, 2 ** self.n), fill_value=-1, dtype='int64')
-        alpha_beta_dict = collections.defaultdict(list)
         for beta_num in range(2 ** self.n):
             beta = np.array(self._get_bool(beta_num))
-            for alpha in self.get_alphas(beta):
-                alpha_beta_dict[tuple(alpha)].append(beta)
-        for alpha in alpha_beta_dict:
-            s = int(np.sum(np.array(alpha) * self.a) > 0)
-            for beta in alpha_beta_dict[alpha]:
-                graph[XS1._get_int(alpha), XS1._get_int(beta)] = s
+            alphas_by_weights = self.get_alphas(beta)
+            for weight, alphas in alphas_by_weights.items():
+                for alpha in alphas:
+                    graph[XS1._get_int(alpha), XS1._get_int(beta)] =\
+                        XS1.weight_selecting_multiedge(graph[XS1._get_int(alpha), XS1._get_int(beta)], weight)
         return graph
 
     @staticmethod
