@@ -3,8 +3,8 @@ import numpy as np
 from numpy import linalg as ling
 
 with open(sys.argv[1]) as inp:
-    lines = list(filter(lambda x: len(x) > 1, inp.read().split("\n")))
-    lines = [list(map(float, filter(lambda x: len(x) > 1, line.split(" ")))) for line in lines]
+    lines = list(filter(lambda x: len(x) > 0, inp.read().split("\n")))
+    lines = [list(map(float, filter(lambda x: len(x) > 0, line.split(" ")))) for line in lines]
 dependency_matrix = np.array(lines)
 
 eigenvalues = ling.eigvals(dependency_matrix)

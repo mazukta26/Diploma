@@ -12,6 +12,7 @@ class ClockSubstitution:
         self.block_size = block_size
         self.block_number = block_number
         self.total_block_number = total_block_number
+        self.probabilistic = probabilistic
         self.xor_matrix = self.create_xor_matrix(block_size, probabilistic)
         self.plus_matrix = self.create_plus_matrix(block_size, probabilistic)
         self.substitution_matrix = self.create_substitution_matrix(block_size, probabilistic)
@@ -109,8 +110,11 @@ class ClockSubstitution:
         return np.dot(self.blocks[block_num], self.__create_G_matrix__(shift_size))
 
     def dependency_matrix(self):
-        return np.concatenate(self.blocks, axis=1)[:self.block_number * self.block_size,
+        concatenated = np.concatenate(self.blocks, axis=1)[:self.block_number * self.block_size,
                                                    :self.block_number * self.block_size]
+        if self.probabilistic:
+            return concatenated
+        return (concatenated > 0).astype("int")
 
 
 def create_belt_dependency_matrix():
