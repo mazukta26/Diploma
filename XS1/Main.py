@@ -20,8 +20,6 @@ def parse_graph(adj_matrix, name):
     graph = Graph(adj_matrix)
     print("Characteristics for {}, graph size is {}:".format(name, graph._n))
     print("MCM characteristic: {}".format(graph.count_c()))
-    # for i in range(1, graph._n*100+1):
-    #     print("Pi({}) = {}".format(i, graph.get_pi(i)))
     print("Pi({}) = {}; Ratio: {}".format(graph._n * 100, graph.get_pi(graph._n * 100),
                                           graph.get_pi(graph._n * 100) / (graph._n * 100)))
 
@@ -36,8 +34,7 @@ def print_report_for_every_scheme():
             parse_graph(xs.create_differential_graph(), "Differential graph")
             print()
 
-
-if __name__ == '__main__':
+def print_report_for_belt_keywrap():
     for n in range(2, 16):
         t = time()
         xs1 = XS1(*create_belt(n))
@@ -47,4 +44,7 @@ if __name__ == '__main__':
         d_graph = Graph(diff)
         print("lambda({}) = {}".format(n, l_graph.count_c()))
         print("pi({}) = {}".format(n, d_graph.count_c()))
-        print(time() - t)
+
+
+if __name__ == '__main__':
+    print_report_for_belt_keywrap()
